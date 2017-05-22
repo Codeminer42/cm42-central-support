@@ -12,6 +12,7 @@ require "central/support/statistics"
 require "central/support/iteration_service"
 require "central/support/iteration"
 require "central/support/mattermost"
+require "central/support/slack"
 
 require 'central/support/validators/belongs_to_project_validator'
 require 'central/support/validators/estimate_validator'
@@ -29,3 +30,4 @@ require 'central/support/concerns/integration_concern'
 IterationService = Central::Support::IterationService
 Iteration        = Central::Support::Iteration
 Mattermost       = Central::Support::Mattermost
+Slack       = Central::Support::Slack
