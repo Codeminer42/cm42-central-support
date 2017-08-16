@@ -20,7 +20,7 @@ module Central
 
     class Slack
       def self.send(private_uri, bot_username, message)
-        Slack.new(private_uri, project_channel, bot_username).send(message)
+        Slack.new(private_uri, bot_username).send(message)
       end
 
       def initialize(private_uri, bot_username = "marvin")
