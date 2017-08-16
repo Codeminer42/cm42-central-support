@@ -3,9 +3,9 @@ require "uri"
 
 module Central
   module Support
-    module SlackHelper
-      def send_slack(integration, message)
-        Central::Support::Slack.send(real_private_uri(integration.data['private_uri'] ),
+    module DiscordHelper
+      def send_discord(integration, message)
+        Central::Support::Discord.send(real_private_uri(integration.data['private_uri'] ),
                         integration.data['bot_username'],
                         message)
       end
@@ -18,9 +18,9 @@ module Central
       end
     end
 
-    class Slack
+    class Discord
       def self.send(private_uri, bot_username, message)
-        Slack.new(private_uri, bot_username).send(message)
+        Discord.new(private_uri, bot_username).send(message)
       end
 
       def initialize(private_uri, bot_username = "marvin")
@@ -34,15 +34,15 @@ module Central
           Rails.logger.debug("URL: #{@private_uri}")
           Rails.logger.debug("Payload: #{payload(text)}")
         else
-          Net::HTTP.post_form(@private_uri, {"payload" => payload(text)})
+          Net::HTTP.post_form(@private_uri, payload(text))
         end
       end
 
       def payload(text)
         {
           username: @bot_username,
-          attachments: text
-        }.to_json
+          content: text
+        }
       end
     end
   end

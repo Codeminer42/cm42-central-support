@@ -4,7 +4,7 @@ module Central
       extend ActiveSupport::Concern
 
       included do
-        VALID_INTEGRATIONS = ['mattermost','slack']
+        VALID_INTEGRATIONS = ['discord','mattermost','slack']
 
         belongs_to :project
         validates :project, presence: true
