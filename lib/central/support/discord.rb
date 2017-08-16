@@ -34,14 +34,27 @@ module Central
           Rails.logger.debug("URL: #{@private_uri}")
           Rails.logger.debug("Payload: #{payload(text)}")
         else
-          Net::HTTP.post_form(@private_uri, payload(text))
+          Net::HTTP.start(@private_uri.host, @private_uri.port, use_ssl: true) do |https|
+            request = Net::HTTP::Post.new(@private_uri.request_uri, { 'Content-Type': 'application/json' })
+            request.body = payload(text).to_json
+
+            https.request(request)
+          end
         end
       end
 
-      def payload(text)
+      def payload(text, truncate_at = 2000)
+        text = { description: text } if text.is_a?(String)
+
+        embeds = [text].flatten.each do |embed|
+          next unless embed[:description].present?
+
+          embed[:description] = embed[:description].truncate(truncate_at)
+        end
+
         {
           username: @bot_username,
-          content: text
+          embeds: embeds
         }
       end
     end
