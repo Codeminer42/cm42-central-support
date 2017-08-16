@@ -6,7 +6,7 @@ This is a library that moves away some of the logic from [Central](https://githu
 
 [![Code Climate](https://codeclimate.com/repos/57e072af8a0f4603260024d5/badges/3ed30d50ad1a44162204/gpa.svg)](https://codeclimate.com/repos/57e072af8a0f4603260024d5/feed)
 [![Test Coverage](https://codeclimate.com/repos/57e072af8a0f4603260024d5/badges/3ed30d50ad1a44162204/coverage.svg)](https://codeclimate.com/repos/57e072af8a0f4603260024d5/coverage)
-[![Build Status](https://travis-ci.org/Codeminer42/cm42-central-support.svg?branch=master)](https://travis-ci.org/Codeminer42/cm42-central-support0)
+[![Build Status](https://travis-ci.org/Codeminer42/cm42-central-support.svg?branch=master)](https://travis-ci.org/Codeminer42/cm42-central-support)
 
 ## Installation
 
