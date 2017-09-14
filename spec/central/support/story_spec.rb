@@ -208,6 +208,37 @@ describe Story, type: :model do
     end
   end
 
+  describe '#delivered_at' do
+    context 'when not set' do
+      before { subject.delivered_at = nil }
+
+      it 'gets set when state changes to delivered_at' do
+        Timecop.freeze(Time.zone.parse('2016-08-31 12:00:00')) do
+          subject.update_attribute :state, 'delivered'
+          expect(subject.delivered_at).to eq(Time.current)
+        end
+      end
+    end
+
+    context 'when there is already a delivered_at' do
+      before { subject.delivered_at = Time.zone.parse('1999/01/01') }
+
+      it 'is unchanged' do
+        subject.update_attribute :state, 'delivered'
+        expect(subject.delivered_at).to eq(Time.zone.parse('1999/01/01'))
+      end
+    end
+
+    context 'when state does not change' do
+      before { subject.delivered_at = nil }
+
+      it 'delivered_at is not filled' do
+        subject.update_attribute :title, 'New title'
+        expect(subject.delivered_at).to eq(nil)
+      end
+    end
+  end
+
   describe "#started_at" do
 
     context "when not set" do

@@ -8,6 +8,7 @@ module Central
           before_validation :set_position_to_last
           before_save :set_started_at
           before_save :set_accepted_at
+          before_save :set_delivered_at
           before_save :cache_user_names
           before_destroy { |record| raise ActiveRecord::ReadOnlyRecord if record.readonly? }
         end
@@ -35,6 +36,12 @@ module Central
           if started_at
             self.cycle_time = accepted_at - started_at
           end
+        end
+
+        def set_delivered_at
+          return unless state_changed?
+          return unless state == 'delivered'
+          self.delivered_at = Time.current if delivered_at.nil?
         end
 
         def cache_user_names
