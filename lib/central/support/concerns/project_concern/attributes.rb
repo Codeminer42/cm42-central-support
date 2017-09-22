@@ -17,7 +17,7 @@ module Central
         end
 
         def iteration_service(since: nil, current_time: nil)
-          @iteration_service ||= Central::Support::IterationService.new(self, since: since, current_time: since)
+          @iteration_service ||= Central::Support::IterationService.new(self, since: since, current_time: current_time)
         end
       end
     end
