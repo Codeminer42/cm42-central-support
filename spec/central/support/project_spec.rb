@@ -183,15 +183,21 @@ describe Project, type: :model do
     end
 
     context 'when since and current_time are not defined' do
+      let(:current_time) { Time.current }
+
       before do
-        allow(Central::Support::IterationService)
-          .to receive(:new)
-          .with(subject, since: nil, current_time: nil)
-          .and_return(iteration_service_stub)
+        Timecop.freeze(current_time) do
+          allow(Central::Support::IterationService)
+            .to receive(:new)
+            .with(subject, since: nil, current_time: current_time)
+            .and_return(iteration_service_stub)
+        end
       end
 
-      it 'uses nil instead to initialize Central::Support::IterationService' do
-        expect(subject.iteration_service).to eq iteration_service_stub
+      it 'defaults nil to since and the current time to current_time' do
+        Timecop.freeze(current_time) do
+          expect(subject.iteration_service).to eq iteration_service_stub
+        end
       end
     end
   end
