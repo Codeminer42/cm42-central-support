@@ -162,5 +162,43 @@ describe Project, type: :model do
     end
   end
 
-end
+  describe '#iteration_service' do
+    let(:iteration_service_stub) { instance_double('Central::Support::IterationService') }
 
+    context 'when since and current_time are defined' do
+      let(:since) { Time.current - 1.day }
+      let(:current_time) { Time.current }
+
+      before do
+        allow(Central::Support::IterationService)
+          .to receive(:new)
+          .with(subject, since: since, current_time: current_time)
+          .and_return(iteration_service_stub)
+      end
+
+      it 'uses them to initialize Central::Support::IterationService' do
+        expect(subject.iteration_service(since: since, current_time: current_time))
+          .to eq iteration_service_stub
+      end
+    end
+
+    context 'when since and current_time are not defined' do
+      let(:current_time) { Time.current }
+
+      before do
+        Timecop.freeze(current_time) do
+          allow(Central::Support::IterationService)
+            .to receive(:new)
+            .with(subject, since: nil, current_time: current_time)
+            .and_return(iteration_service_stub)
+        end
+      end
+
+      it 'defaults nil to since and the current time to current_time' do
+        Timecop.freeze(current_time) do
+          expect(subject.iteration_service).to eq iteration_service_stub
+        end
+      end
+    end
+  end
+end
