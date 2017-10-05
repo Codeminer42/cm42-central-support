@@ -163,9 +163,9 @@ describe Central::Support::IterationService do
         expect(service.velocity).to eq(23)
       end
 
-      it 'assures it bypasses zeroed iterations' do
-        allow(service).to receive(:group_by_velocity) { {1=>10, 2=>20, 3=>30, 4=>12, 5=>12, 6=>0, 7=>0, 8=>20, 9=>16} }
-        expect(service.velocity).to eq(16) # ( 12 + 20 + 16 ) / 3 = 16
+      it 'assures it not bypasses zeroed iterations' do
+        allow(service).to receive(:group_by_all_iterations) { {1=>[1], 2=>[1], 3=>[], 4=>[], 5=>[], 6=>[], 7=>[], 8=>[], 9=>[8, 8, 8]} }
+        expect(service.velocity).to eq(8) # ( 0 + 0 + 24 ) / 3 = 8
       end
 
       it 'should not return less than 1' do
@@ -174,7 +174,7 @@ describe Central::Support::IterationService do
       end
 
       it 'should return the default velocity' do
-        allow(service).to receive(:group_by_iteration) { {} }
+        allow(service).to receive(:group_by_all_iterations) { {} }
         expect(service.velocity).to eq(10)
       end
     end
