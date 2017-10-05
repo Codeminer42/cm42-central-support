@@ -164,7 +164,7 @@ describe Central::Support::IterationService do
       end
 
       it 'assures it not bypasses zeroed iterations' do
-        allow(service).to receive(:group_by_all_iterations) { {1=>[1], 2=>[1], 3=>[], 4=>[], 5=>[], 6=>[], 7=>[], 8=>[], 9=>[8, 8, 8]} }
+        allow(service).to receive(:group_by_all_iterations) { {1=>[8], 2=>[8], 3=>[0], 4=>[0], 5=>[0], 6=>[0], 7=>[0], 8=>[0], 9=>[8, 8, 8]} }
         expect(service.velocity).to eq(8) # ( 0 + 0 + 24 ) / 3 = 8
       end
 

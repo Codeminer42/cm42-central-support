@@ -113,7 +113,7 @@ module Central
       end
 
       def group_by_all_iterations
-        iterations = (1...current_iteration_number).map { |num| [num, []] }
+        iterations = (1...current_iteration_number).map { |num| [num, [0]] }
 
         Hash[iterations].merge(group_by_iteration)
       end
@@ -162,7 +162,7 @@ module Central
           number_of_iterations = group_by_all_iterations.size if number_of_iterations > group_by_all_iterations.size
           return 1 if number_of_iterations.zero?
 
-          iterations = Statistics.slice_non_zero(group_by_velocity.values, number_of_iterations)
+          iterations = group_by_velocity.values.reverse.take(number_of_iterations)
 
           if iterations.size > 0
             velocity = (Statistics.sum(iterations) / Statistics.total(iterations)).floor
