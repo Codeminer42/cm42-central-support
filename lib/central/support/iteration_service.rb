@@ -112,6 +112,12 @@ module Central
           end
       end
 
+      def group_by_all_iterations
+        iterations = (1...current_iteration_number).map { |num| [num, []] }
+
+        Hash[iterations].merge(group_by_iteration)
+      end
+
       def stories_estimates(stories)
         stories.map do |story|
           if Story::ESTIMABLE_TYPES.include? story.story_type
@@ -123,7 +129,7 @@ module Central
       end
 
       def group_by_velocity
-        @group_by_velocity ||= group_by_iteration.reduce({}) do |group, iteration|
+        @group_by_velocity ||= group_by_all_iterations.reduce({}) do |group, iteration|
           group.merge(iteration.first => iteration.last.reduce(&:+))
         end
       end
@@ -150,10 +156,10 @@ module Central
       end
 
       def velocity(number_of_iterations = VELOCITY_ITERATIONS)
-        return DEFAULT_VELOCITY unless group_by_iteration.size > 0
+        return DEFAULT_VELOCITY if group_by_all_iterations.size.zero?
         @velocity ||= {}
         @velocity[number_of_iterations] ||= begin
-          number_of_iterations = group_by_iteration.size if number_of_iterations > group_by_iteration.size
+          number_of_iterations = group_by_all_iterations.size if number_of_iterations > group_by_all_iterations.size
           return 1 if number_of_iterations.zero?
 
           iterations = Statistics.slice_non_zero(group_by_velocity.values, number_of_iterations)
