@@ -162,7 +162,7 @@ module Central
           number_of_iterations = group_by_all_iterations.size if number_of_iterations > group_by_all_iterations.size
           return 1 if number_of_iterations.zero?
 
-          iterations = group_by_velocity.values.reverse.take(number_of_iterations)
+          iterations = Statistics.slice_to_sample_size(group_by_velocity.values, number_of_iterations)
 
           if iterations.size > 0
             velocity = (Statistics.sum(iterations) / Statistics.total(iterations)).floor
@@ -244,7 +244,7 @@ module Central
         last_iteration_number = iterations.last.number
         if calculate_worst
           std_dev                     = Statistics.standard_deviation(group_by_velocity.values, STD_DEV_ITERATIONS)
-          ten_iterations_slice        = Statistics.slice_non_zero(group_by_velocity.values, STD_DEV_ITERATIONS)
+          ten_iterations_slice        = Statistics.slice_to_sample_size(group_by_velocity.values, STD_DEV_ITERATIONS)
           mean_of_last_ten_iterations = Statistics.mean(ten_iterations_slice)
           if std_dev > 0.0 && mean_of_last_ten_iterations > 0.0
             extra_iterations            = ( std_dev * iterations.size / mean_of_last_ten_iterations ).round
