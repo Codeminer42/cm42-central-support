@@ -244,6 +244,10 @@ describe Central::Support::IterationService do
 
       volatility = service.volatility # population (no variance correction)
       expect("%.4f" % volatility).to eq("0.3816")
+
+      # must return 0 if there is no accepted stories on the project
+      allow(service).to receive(:group_by_velocity) { Hash[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] }
+      expect(service.volatility).to eq(0)
     end
 
     it '#backlog_date' do
