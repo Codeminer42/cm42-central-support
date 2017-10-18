@@ -12,3 +12,4 @@
 *.gem
 Gemfile.lock
 coverage
+spec/support/rails_app/config/database.yml
