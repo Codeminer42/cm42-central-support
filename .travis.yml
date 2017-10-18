@@ -10,6 +10,8 @@ before_install: gem install bundler -v 1.12.5
 
 before_script:
   - "cd spec/support/rails_app"
+  - "cp config/database.yml.sample config/database.yml"
+  - "sed -i '/host*/d' config/database.yml && sed -i '/username*/d' config/database.yml && sed -i '/password*/d' config/database.yml"
   - "bundle install"
   - "cd ../../.."
 

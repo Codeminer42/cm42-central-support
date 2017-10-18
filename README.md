@@ -42,6 +42,24 @@ After checking out the repo, run `bin/setup` to install dependencies. Then, run 
 
 To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
 
+### Using Docker
+
+To setup the gem with docker you can execute the following steps:
+
+```
+cp spec/support/rails_app/config/database.yml.sample spec/support/rails_app/config/database.yml
+docker-compose build
+docker-compose up
+```
+
+This will build the image and start the postgres and the app container. The app container will keep running with a `tail -f /dev/null` command, since the gem doesn't run with a server, like an traditional rails app.
+
+To execute the tests you can run (in other shell, while the container is up) the command:
+
+```
+docker-compose exec app rspec
+```
+
 ## Contributing
 
 Bug reports and pull requests are welcome on GitHub at https://github.com/Codeminer-42/central-support.

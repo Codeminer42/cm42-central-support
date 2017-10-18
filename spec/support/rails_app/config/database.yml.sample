@@ -7,6 +7,9 @@ development:
 
 test:
   adapter: postgresql
+  host: postgres
+  username: postgres
+  password: postgres
   encoding: unicode
   database: central_support_test
   pool: 5
