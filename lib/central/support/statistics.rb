@@ -26,8 +26,11 @@ module Central
       def self.volatility(enumerable, sample_size = enumerable.size)
         slice = slice_to_sample_size(enumerable, sample_size)
         return 0 if slice.empty?
+        
+        mean = mean(slice)
+        return 0 if mean.zero?
 
-        standard_deviation(enumerable, sample_size) / mean(slice)
+        standard_deviation(enumerable, sample_size) / mean
       end
 
       def self.to_float(enumerable)
