@@ -364,4 +364,47 @@ describe Story, type: :model do
 
   end
 
+  describe '#cache_user_names' do
+    context 'when adding a requester and owner to a story' do
+      let(:requester)  { build(:user) }
+      let(:owner)      { build(:user) }
+      let(:story) { create(:story, :with_project, owned_by: nil, requested_by: requester) }
+
+      before do
+        story.update_attributes(owned_by: owner)
+      end
+
+      specify { expect(story.requested_by_name).to eq(requester.name) }
+      specify { expect(story.owned_by_name).to eq(owner.name) }
+      specify { expect(story.owned_by_initials).to eq(owner.initials) }
+    end
+
+    context 'when removing a owner to a story' do
+      let(:owner)      { build(:user) }
+      let(:story) { create(:story, :with_project, owned_by: owner) }
+
+      before do
+        story.update_attributes(owned_by: nil)
+      end
+
+      specify { expect(story.owned_by_name).to be_nil }
+      specify { expect(story.owned_by_initials).to be_nil }
+    end
+
+    context 'when changing a requested and owner of a story' do
+      let(:requester)     { build(:user) }
+      let(:owner)         { build(:user) }
+      let(:requester2)    { build(:user) }
+      let(:owner2)        { build(:user) }
+      let(:story) { create(:story, :with_project, owned_by: owner, requested_by: requester) }
+
+      before do
+        story.update_attributes(owned_by: owner2, requested_by: requester2)
+      end
+
+      specify { expect(story.requested_by_name).to eq(requester2.name) }
+      specify { expect(story.owned_by_name).to eq(owner2.name) }
+      specify { expect(story.owned_by_initials).to eq(owner2.initials) }
+    end
+  end
 end
