@@ -45,11 +45,9 @@ module Central
         end
 
         def cache_user_names
-          self.requested_by_name = requested_by.name unless requested_by.nil?
-          if owned_by.present?
-            self.owned_by_name     = owned_by.name
-            self.owned_by_initials = owned_by.initials
-          end
+          self.requested_by_name = requested_by&.name
+          self.owned_by_name     = owned_by&.name
+          self.owned_by_initials = owned_by&.initials
         end
       end
     end
