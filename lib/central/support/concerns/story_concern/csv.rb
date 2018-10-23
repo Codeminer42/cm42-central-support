@@ -18,7 +18,6 @@ module Central
           end
 
           has_many :notes, -> { order(:created_at) }, dependent: :destroy do
-
             # Creates a collection of rows on this story from a CSV::Row instance
             # Each 'Note' field in the CSV will usually be in the following format:
             #
@@ -54,7 +53,7 @@ module Central
           end
         end
 
-        def to_csv
+        def to_csv(max_notes, max_documents)
           [
             id,                       # Id
             title,                    # Story
@@ -73,7 +72,20 @@ module Central
             owned_by_name,            # Owned By
             description,              # Description
             nil                       # URL
-          ].concat(notes.map(&:to_s))
+          ].concat(fill_columns_with(notes, max_notes))
+            .concat(fill_columns_with(documents, max_documents))
+        end
+
+        private
+
+        def fill_columns_with(values, number_of_columns)
+          columns = []
+
+          (0...number_of_columns).each do |i|
+            columns << values[i].to_s || nil
+          end
+
+          columns
         end
       end
     end
