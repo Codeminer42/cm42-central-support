@@ -11,7 +11,6 @@ module Central
         module Import
           # Populates the stories collection from a CSV string.
           def from_csv(csv_string)
-
             # Eager load this so that we don't have to make multiple db calls when
             # searching for users by full name from the CSV.
             users = proxy_association.owner.users
@@ -37,6 +36,12 @@ module Central
               story.requested_by_name = ( row["Requested By"] || "").truncate(255)
               story.owned_by_name = ( row["Owned By"] || "").truncate(255)
               story.owned_by_initials = ( row["Owned By"] || "" ).split(' ').map { |n| n[0].upcase }.join('')
+
+              row.each do |header, value|
+                if header == 'Document' && value.present?
+                  story.documents << ::Attachinary::File.new(JSON.parse(value.gsub '=>', ':'))
+                end
+              end
 
               tasks = []
               row.each do |header, value|
