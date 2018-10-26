@@ -37,23 +37,22 @@ module Central
               story.owned_by_name = ( row["Owned By"] || "").truncate(255)
               story.owned_by_initials = ( row["Owned By"] || "" ).split(' ').map { |n| n[0].upcase }.join('')
 
+              tasks = []
               row.each do |header, value|
-                if header == 'Document' && value.present?
-                  story.documents << ::Attachinary::File.new(JSON.parse(value.gsub '=>', ':'))
+                if value.present?
+                  case header
+                  when 'Document'
+                    story.documents << ::Attachinary::File.new(JSON.parse(value.gsub '=>', ':'))
+                  when 'Task'
+                    tasks << "* #{value}" if header == 'Task' && value
+                  end
                 end
               end
 
-              tasks = []
-              row.each do |header, value|
-                tasks << "* #{value}" if header == 'Task' && value
-              end
               story.description = "#{story.description}\n\nTasks:\n\n#{tasks.join("\n")}" unless tasks.empty?
               story.project.suppress_notifications = true # otherwise the import will generate massive notifications!
+              story.notes = story.notes.from_csv_row(row)
               story.save
-
-              # Generate notes for this story if any are present
-              story.notes.from_csv_row(row)
-
               story
             end
           end
