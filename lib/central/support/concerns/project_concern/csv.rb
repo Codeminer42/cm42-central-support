@@ -23,16 +23,11 @@ module Central
                 story_type:   (row_attrs["Type"] || row_attrs["Story Type"]).downcase,
                 requested_by: users.detect {|u| u.name == row["Requested By"]},
                 owned_by:     users.detect {|u| u.name == row["Owned By"]},
-                accepted_at:  row_attrs["Accepted at"],
                 estimate:     row_attrs["Estimate"],
                 labels:       row_attrs["Labels"],
                 description:  row_attrs["Description"]
               })
 
-              row_state = ( row_attrs["Current State"] || 'unstarted').downcase
-              if Story.available_states.include?(row_state.to_sym)
-                story.state = row_state
-              end
               story.requested_by_name = ( row["Requested By"] || "").truncate(255)
               story.owned_by_name = ( row["Owned By"] || "").truncate(255)
               story.owned_by_initials = ( row["Owned By"] || "" ).split(' ').map { |n| n[0].upcase }.join('')
@@ -52,11 +47,17 @@ module Central
                   end
                 end
               end
-
               story.description = story.description
               story.project.suppress_notifications = true # otherwise the import will generate massive notifications!
-              story.notes = story.notes.from_csv_row(row)
               story.tasks = tasks
+              story.notes = story.notes.from_csv_row(row)
+              story.save
+
+              row_state = ( row_attrs["Current State"] || 'unstarted').downcase
+              if Story.available_states.include?(row_state.to_sym)
+                story.state = row_state
+              end
+              story.accepted_at = row_attrs["Accepted at"]
               story.save
               story
             end
