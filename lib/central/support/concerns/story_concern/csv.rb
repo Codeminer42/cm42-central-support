@@ -53,7 +53,7 @@ module Central
           end
         end
 
-        def to_csv(max_notes, max_documents)
+        def to_csv(number_of_columns_of_notes, number_of_columns_of_documents,number_of_columns_of_tasks)
           [
             id,                       # Id
             title,                    # Story
@@ -72,8 +72,9 @@ module Central
             owned_by_name,            # Owned By
             description,              # Description
             nil                       # URL
-          ].concat(fill_columns_with(notes, max_notes))
-            .concat(fill_columns_with(documents, max_documents))
+          ].concat(fill_columns_with(notes, number_of_columns_of_notes))
+            .concat(fill_columns_with(documents, number_of_columns_of_documents))
+            .concat(fill_columns_with(tasks, number_of_columns_of_tasks).flatten)
         end
 
         private
