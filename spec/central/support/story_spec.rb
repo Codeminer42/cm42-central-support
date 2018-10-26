@@ -253,6 +253,7 @@ describe Story, type: :model do
   describe '#to_csv' do
     let(:story) { create(:story, :with_project) }
 
+    let(:number_of_extra_columns) { { tasks: 0, notes: 0, documents: 0 } }
     let(:task) { double('task') }
     let(:tasks) { [task] }
 
@@ -269,11 +270,11 @@ describe Story, type: :model do
     end
 
     it 'returns an array' do
-      expect(story.to_csv(0, 0, 0)).to be_kind_of(Array)
+      expect(story.to_csv(number_of_extra_columns)).to be_kind_of(Array)
     end
 
     it 'has the same number of elements as the .csv_headers' do
-      expect(story.to_csv(0, 0, 0).length).to eq(Story.csv_headers.length)
+      expect(story.to_csv(number_of_extra_columns).length).to eq(Story.csv_headers.length)
     end
 
     context 'when story have tasks' do
@@ -281,15 +282,16 @@ describe Story, type: :model do
       let(:task_status) { 'completed' }
 
       before do
-        allow(task).to receive(:to_s).and_return([task_name, task_status])
+        allow(task).to receive(:to_csv).and_return([task_name, task_status])
+        number_of_extra_columns[:tasks] = 1
       end
 
       it 'return task name' do
-        expect(story.to_csv(0, 0, 1)).to include(task_name)
+        expect(story.to_csv(number_of_extra_columns)).to include(task_name)
       end
 
       it 'return task status' do
-        expect(story.to_csv(0, 0, 1)).to include(task_status)
+        expect(story.to_csv(number_of_extra_columns)).to include(task_status)
       end
     end
 
@@ -297,23 +299,34 @@ describe Story, type: :model do
       let(:note_body) { 'This is the note body text (Note Author - Dec 25, 2011)' }
 
       before do
-        allow(note).to receive(:to_s).and_return(note_body)
+        allow(note).to receive(:to_csv).and_return(note_body)
+        number_of_extra_columns[:notes] = 1
       end
 
       it 'return note body' do
-        expect(story.to_csv(1, 0, 0)).to include(note_body)
+        expect(story.to_csv(number_of_extra_columns)).to include(note_body)
       end
     end
 
     context 'when story have documents' do
-      let(:document_content) { 'This is the note body text (Note Author - Dec 25, 2011)' }
+      let(:document_content) do
+        '{"attachinariable_type"=>"Story",
+          "scope"=>"documents",
+          "public_id"=>"programming-motherfucker-1-728_qhl2tl",
+          "version"=>"1540488712",
+          "width"=>728,
+          "height"=>546,
+          "format"=>"jpg",
+          "resource_type"=>"image"}'
+      end
 
       before do
-        allow(document).to receive(:to_s).and_return(document_content)
+        allow(document).to receive(:to_csv).and_return(document_content)
+        number_of_extra_columns[:documents] = 1
       end
 
       it 'return note body' do
-        expect(story.to_csv(0, 1, 0)).to include(document_content)
+        expect(story.to_csv(number_of_extra_columns)).to include(document_content)
       end
     end
   end

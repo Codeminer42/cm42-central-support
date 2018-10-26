@@ -53,7 +53,7 @@ module Central
           end
         end
 
-        def to_csv(number_of_columns_of_notes, number_of_columns_of_documents,number_of_columns_of_tasks)
+        def to_csv(number_of_extra_columns)
           [
             id,                       # Id
             title,                    # Story
@@ -72,18 +72,24 @@ module Central
             owned_by_name,            # Owned By
             description,              # Description
             nil                       # URL
-          ].concat(fill_columns_with(notes, number_of_columns_of_notes))
-            .concat(fill_columns_with(documents, number_of_columns_of_documents))
-            .concat(fill_columns_with(tasks, number_of_columns_of_tasks).flatten)
+          ].concat(extra_columns(number_of_extra_columns))
         end
 
         private
 
-        def fill_columns_with(values, number_of_columns)
+        def extra_columns(number_of_extra_columns)
+          [
+            fill_columns_with(notes, number_of_extra_columns[:notes]),
+            fill_columns_with(documents, number_of_extra_columns[:documents]),
+            fill_columns_with(tasks, number_of_extra_columns[:tasks]).flatten
+          ].flatten
+        end
+
+        def fill_columns_with(values, number_of_extra_columns)
           columns = []
 
-          (0...number_of_columns).each do |i|
-            columns << values[i].to_s || nil
+          (0...number_of_extra_columns).each do |i|
+            columns << values[i].try(:to_csv)
           end
 
           columns
