@@ -11,7 +11,6 @@ module Central
         module Import
           # Populates the stories collection from a CSV string.
           def from_csv(csv_string)
-
             # Eager load this so that we don't have to make multiple db calls when
             # searching for users by full name from the CSV.
             users = proxy_association.owner.users
@@ -24,31 +23,42 @@ module Central
                 story_type:   (row_attrs["Type"] || row_attrs["Story Type"]).downcase,
                 requested_by: users.detect {|u| u.name == row["Requested By"]},
                 owned_by:     users.detect {|u| u.name == row["Owned By"]},
-                accepted_at:  row_attrs["Accepted at"],
                 estimate:     row_attrs["Estimate"],
                 labels:       row_attrs["Labels"],
                 description:  row_attrs["Description"]
               })
 
-              row_state = ( row_attrs["Current State"] || 'unstarted').downcase
-              if Story.available_states.include?(row_state.to_sym)
-                story.state = row_state
-              end
               story.requested_by_name = ( row["Requested By"] || "").truncate(255)
               story.owned_by_name = ( row["Owned By"] || "").truncate(255)
               story.owned_by_initials = ( row["Owned By"] || "" ).split(' ').map { |n| n[0].upcase }.join('')
 
               tasks = []
-              row.each do |header, value|
-                tasks << "* #{value}" if header == 'Task' && value
+              row.each_with_index do |header_value, i |
+                header = header_value.first
+                value = header_value.last
+                if value.present?
+                  case header
+                  when 'Document'
+                    story.documents << ::Attachinary::File.new(JSON.parse(value.gsub '=>', ':'))
+                  when 'Task'
+                    next_value = row[i+1].nil? ? "" : row[i+1]
+                    next if next_value.blank?
+                    tasks.unshift(Task.new(name: value, done: next_value == 'completed'))
+                  end
+                end
               end
-              story.description = "#{story.description}\n\nTasks:\n\n#{tasks.join("\n")}" unless tasks.empty?
+              story.description = story.description
               story.project.suppress_notifications = true # otherwise the import will generate massive notifications!
+              story.tasks = tasks
+              story.notes = story.notes.from_csv_row(row)
               story.save
 
-              # Generate notes for this story if any are present
-              story.notes.from_csv_row(row)
-
+              row_state = ( row_attrs["Current State"] || 'unstarted').downcase
+              if Story.available_states.include?(row_state.to_sym)
+                story.state = row_state
+              end
+              story.accepted_at = row_attrs["Accepted at"]
+              story.save
               story
             end
           end
