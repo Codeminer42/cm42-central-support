@@ -9,6 +9,11 @@ module Central
           belongs_to :owned_by, class_name: 'User'
 
           has_many :users, through: :project
+          has_many :tasks
+          has_attachments :documents,
+                          accept: %i[raw jpg png psd docx xlsx doc xls pdf],
+                          maximum: 10
+          attr_accessor :documents_attributes_was
         end
 
         # The list of users that should be notified when a new note is added to this

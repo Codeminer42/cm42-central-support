@@ -119,6 +119,8 @@ describe Project, type: :model do
 
   describe 'CSV import' do
     let(:project) { create :project }
+    let(:task) { double('task') }
+    let(:tasks) { [task, task] }
     let(:user) do
       create(:user).tap do |user|
         # project.users << user
@@ -138,6 +140,67 @@ describe Project, type: :model do
 
       project.stories.from_csv csv_string
       expect(project.stories.first.story_type).to eq('chore')
+    end
+
+    context 'with notes' do
+      let(:csv_string) { "Id,Story,Labels,Iteration,Iteration Start,Iteration End,Story Type,Estimate,Current State,Started At,Created at,Accepted at,Deadline,Requested By,Owned By,Description,URL,Note,Note\n" }
+      let(:stories) { project.stories.first.notes }
+
+      it 'imports notes' do
+        csv_string << "9,Story title,,,,,feature,5,started,2018-10-24 10:03:40 -0300,2018-10-24 10:01:41 -0300,,,#{user.name},#{user.name},,,\"Something here (#{user.name} - Oct 24, 2018)\",\"task 2 (#{user.name} - Oct 24, 2018)\""
+
+        project.stories.from_csv csv_string
+        expect(stories.count).to eq(2)
+      end
+    end
+
+    context 'with document' do
+      let(:csv_string) { "Id,Story,Story Type,Requested By,Owned By,Description,Document\n" }
+      let(:documents) { project.stories.first.documents }
+
+      it 'imports document' do
+        csv_string << '9,Story title,feature,' + user.name + ',' + user.name + ',,"{""attachinariable_type""=>""Story"", ""scope""=>""documents"", ""public_id""=>""Screenshot_from_2018-10-08_09-27-10_qzv5fk"", ""version""=>""1540468782"", ""width""=>1366, ""height""=>768, ""format""=>""png"", ""resource_type""=>""image""}"'
+
+        VCR.use_cassette('cloudinary_upload_import_csv') do
+          project.stories.from_csv csv_string
+          expect(documents.count).to eq(1)
+        end
+      end
+    end
+
+    context 'with task' do
+      let(:csv_string) { "Id,Story,Story Type,Requested By,Owned By,Description,Task,Task Status\n" }
+      let(:tasks) {project.stories.first.tasks}
+      let(:task) {tasks.first}
+
+      it 'imports task' do
+        csv_string << "9,Story title,feature,#{user.name},#{user.name},description,Task 1,completed"
+
+        project.stories.from_csv csv_string
+        expect(tasks.count).to eq(1)
+      end
+
+      context 'when task_status not_completed' do
+        let(:not_completed_task_csv) { "9,Story title,feature,#{user.name},#{user.name},description,Task 1,not_completed" }
+
+        it 'task.done is false' do
+          csv_string << not_completed_task_csv
+
+          project.stories.from_csv csv_string
+          expect(task.done).to be false
+        end
+      end
+
+      context 'when task_status completed' do
+        let(:completed_task_csv) { "9,Story title,feature,#{user.name},#{user.name},description,Task 1,completed" }
+
+        it 'task.done is true' do
+          csv_string << completed_task_csv
+
+          project.stories.from_csv csv_string
+          expect(task.done).to be true
+        end
+      end
     end
   end
 

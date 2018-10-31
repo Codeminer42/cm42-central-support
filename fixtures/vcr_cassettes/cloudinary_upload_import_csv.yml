@@ -1,0 +1,57 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://api.cloudinary.com/v1_1/localhost/image/tags
+    body:
+      encoding: UTF-8
+      string: timestamp=1540922957&tag=attachinary_tmp&public_ids[]=Screenshot_from_2018-10-08_09-27-10_qzv5fk&command=remove&signature=e6517fe205c5a3bbaad3d8dfbd127922111b48a0&api_key=692495869557314
+    headers:
+      Accept:
+      - "*/*"
+      Accept-Encoding:
+      - gzip, deflate
+      User-Agent:
+      - CloudinaryRuby/1.1.7
+      Content-Length:
+      - '186'
+      Content-Type:
+      - application/x-www-form-urlencoded
+      Host:
+      - api.cloudinary.com
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Cache-Control:
+      - max-age=0, private, must-revalidate
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Tue, 30 Oct 2018 18:09:18 GMT
+      Etag:
+      - W/"7bd9202622f9de0e2f09217fcdc4d855"
+      Server:
+      - cloudinary
+      Status:
+      - 200 OK
+      X-Request-Id:
+      - af291bbd6a862c36
+      X-Ua-Compatible:
+      - IE=Edge,chrome=1
+      X-Xss-Protection:
+      - 1; mode=block
+      Content-Length:
+      - '43'
+      Connection:
+      - keep-alive
+    body:
+      encoding: ASCII-8BIT
+      string: !binary |-
+        H4sIAAAAAAAAA6pWKihNyslMjs9MKVayio6tBQAAAP//AwDagr9HEQAAAA==
+    http_version: 
+  recorded_at: Tue, 30 Oct 2018 18:09:18 GMT
+recorded_with: VCR 4.0.0

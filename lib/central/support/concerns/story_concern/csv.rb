@@ -86,13 +86,9 @@ module Central
         end
 
         def fill_columns_with(values, number_of_extra_columns)
-          columns = []
-
-          (0...number_of_extra_columns).each do |i|
-            columns << values[i].try(:to_csv)
+          (0...number_of_extra_columns).map do |column_number|
+            values[column_number].try(:to_csv)
           end
-
-          columns
         end
       end
     end

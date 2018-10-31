@@ -33,18 +33,15 @@ module Central
               story.owned_by_initials = ( row["Owned By"] || "" ).split(' ').map { |n| n[0].upcase }.join('')
 
               tasks = []
-              row.each_with_index do |header_value, i |
-                header = header_value.first
-                value = header_value.last
-                if value.present?
-                  case header
-                  when 'Document'
-                    story.documents << ::Attachinary::File.new(JSON.parse(value.gsub '=>', ':'))
-                  when 'Task'
-                    next_value = row[i+1].nil? ? "" : row[i+1]
-                    next if next_value.blank?
-                    tasks.unshift(Task.new(name: value, done: next_value == 'completed'))
-                  end
+              row.each_with_index do |(header, value), index |
+                next unless value.present?
+                case header
+                when 'Document'
+                  story.documents << ::Attachinary::File.new(JSON.parse(value.gsub '=>', ':'))
+                when 'Task'
+                  next_value = row[index+1].presence
+                  next if next_value.blank?
+                  tasks.unshift(Task.new(name: value, done: next_value == 'completed'))
                 end
               end
               story.description = story.description
