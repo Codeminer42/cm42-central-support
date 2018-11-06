@@ -11,7 +11,7 @@ module Central
           has_many :users, through: :project
           has_many :tasks
           has_attachments :documents,
-                          accept: %i[raw jpg png psd docx xlsx doc xls pdf],
+                          accept: %i[raw jpg png psd docx xlsx doc xls pdf odt odm ods odg odp odb],
                           maximum: 10
           attr_accessor :documents_attributes_was
         end

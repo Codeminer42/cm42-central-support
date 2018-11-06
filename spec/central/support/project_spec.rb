@@ -119,8 +119,9 @@ describe Project, type: :model do
 
   describe 'CSV import' do
     let(:project) { create :project }
-    let(:task) { double('task') }
-    let(:tasks) { [task, task] }
+    let(:task_1) { double('task_1') }
+    let(:task_2) { double('task_2') }
+    let(:tasks) { [task_1, task_2] }
     let(:user) do
       create(:user).tap do |user|
         # project.users << user
@@ -151,6 +152,25 @@ describe Project, type: :model do
 
         project.stories.from_csv csv_string
         expect(stories.count).to eq(2)
+      end
+      
+      context 'when user not exist' do
+        let(:note_csv) { "9,Story title,,,,,feature,5,started,2018-10-24 10:03:40 -0300,2018-10-24 10:01:41 -0300,,,#{user.name},#{user.name},,,\"Something here (any_user - Oct 24, 2018)\",\"task 2 (any_user - Oct 24, 2018)\"" }
+        let(:note) { project.stories.first.notes.first }
+
+        it 'should note.user_name equal any_user' do
+          csv_string << note_csv
+
+          project.stories.from_csv csv_string
+          expect(note.user_name).to eq 'any_user'
+        end
+
+        it 'should note.user_id equal nil' do
+          csv_string << note_csv
+
+          project.stories.from_csv csv_string
+          expect(note.user_id).to be nil
+        end
       end
     end
 

@@ -44,10 +44,9 @@ module Central
                   tasks.unshift(Task.new(name: value, done: next_value == 'completed'))
                 end
               end
-              story.description = story.description
               story.project.suppress_notifications = true # otherwise the import will generate massive notifications!
               story.tasks = tasks
-              story.notes = story.notes.from_csv_row(row)
+              story.notes.from_csv_row(row)
               story.save
 
               row_state = ( row_attrs["Current State"] || 'unstarted').downcase
