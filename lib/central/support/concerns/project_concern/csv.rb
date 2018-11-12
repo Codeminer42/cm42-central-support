@@ -37,7 +37,7 @@ module Central
                 next unless value.present?
                 case header
                 when 'Document'
-                  story.documents << ::Attachinary::File.new(JSON.parse(value.gsub '=>', ':'))
+                  story.documents << ::Attachinary::File.new(JSON.parse(value))
                 when 'Task'
                   next_value = row[index+1].presence
                   next if next_value.blank?

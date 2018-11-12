@@ -179,7 +179,7 @@ describe Project, type: :model do
       let(:documents) { project.stories.first.documents }
 
       it 'imports document' do
-        csv_string << '9,Story title,feature,' + user.name + ',' + user.name + ',,"{""attachinariable_type""=>""Story"", ""scope""=>""documents"", ""public_id""=>""Screenshot_from_2018-10-08_09-27-10_qzv5fk"", ""version""=>""1540468782"", ""width""=>1366, ""height""=>768, ""format""=>""png"", ""resource_type""=>""image""}"'
+        csv_string << '9,Story title,feature,' + user.name + ',' + user.name + ',,"{""attachinariable_type"":""Story"",""scope"":""documents"",""public_id"":""road_marking_bridge_123398_2560x1080_odwfow"",""version"":""1542027351"",""width"":2560,""height"":1080,""format"":""jpg"",""resource_type"":""image""}"'
 
         VCR.use_cassette('cloudinary_upload_import_csv') do
           project.stories.from_csv csv_string
