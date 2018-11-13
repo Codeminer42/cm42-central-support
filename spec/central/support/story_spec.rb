@@ -1,16 +1,14 @@
 require 'rails_helper'
 
 describe Story, type: :model do
-
   subject { build :story, :with_project }
-  before {
+  before do
     subject.acting_user = build(:user)
-  }
+  end
 
-  describe "validations" do
-
+  describe 'validations' do
     describe '#title' do
-      it "is required" do
+      it 'is required' do
         subject.title = ''
         subject.valid?
         expect(subject.errors[:title].size).to eq(1)
@@ -23,28 +21,28 @@ describe Story, type: :model do
     end
 
     describe '#state' do
-      it "must be a valid state" do
+      it 'must be a valid state' do
         subject.state = 'flum'
         subject.valid?
         expect(subject.errors[:state].size).to eq(1)
       end
     end
 
-    describe "#project" do
-      it "cannot be nil" do
+    describe '#project' do
+      it 'cannot be nil' do
         subject.project_id = nil
         subject.valid?
         expect(subject.errors[:project].size).to eq(1)
       end
 
-      it "must have a valid project_id" do
-        subject.project_id = "invalid"
+      it 'must have a valid project_id' do
+        subject.project_id = 'invalid'
         subject.valid?
         expect(subject.errors[:project].size).to eq(1)
       end
 
-      it "must have a project" do
-        subject.project =  nil
+      it 'must have a project' do
+        subject.project = nil
         subject.valid?
         expect(subject.errors[:project].size).to eq(1)
       end
@@ -52,36 +50,35 @@ describe Story, type: :model do
 
     describe '#estimate' do
       before do
-        subject.project.users = [ subject.requested_by ]
+        subject.project.users = [subject.requested_by]
       end
 
-      it "must be valid for the project point scale" do
+      it 'must be valid for the project point scale' do
         subject.project.point_scale = 'fibonacci'
         subject.estimate = 4 # not in the fibonacci series
         subject.valid?
         expect(subject.errors[:estimate].size).to eq(1)
       end
 
-      it "must be invalid for bug stories" do
+      it 'must be invalid for bug stories' do
         subject.story_type = 'bug'
         subject.estimate = 2
 
         expect(subject).to_not be_valid
       end
 
-      it "must be invalid for chore stories" do
+      it 'must be invalid for chore stories' do
         subject.story_type = 'chore'
         subject.estimate = 1
 
         expect(subject).to_not be_valid
       end
     end
-
   end
 
   describe 'associations' do
     describe 'notes' do
-      let!(:user)  { create :user }
+      let!(:user) { create :user }
       let!(:project) { create :project, users: [user] }
       let!(:story) { create :story, project: project, requested_by: user }
       let!(:note) { create(:note, created_at: Date.current + 2.days, user: user, story: story) }
@@ -95,95 +92,84 @@ describe Story, type: :model do
     end
   end
 
-  describe "#to_s" do
-
-    before { subject.title = "Dummy Title" }
-    its(:to_s) { should == "Dummy Title" }
-
+  describe '#to_s' do
+    before { subject.title = 'Dummy Title' }
+    its(:to_s) { should == 'Dummy Title' }
   end
 
-  describe "#estimated?" do
-
-    context "when estimate is nil" do
+  describe '#estimated?' do
+    context 'when estimate is nil' do
       before { subject.estimate = nil }
       it { is_expected.not_to be_estimated }
     end
 
-    context "when estimate is not nil" do
+    context 'when estimate is not nil' do
       before { subject.estimate = 0 }
       it { is_expected.to be_estimated }
     end
-
   end
 
-  describe "#estimable?" do
-
-    context "when story is a feature" do
+  describe '#estimable?' do
+    context 'when story is a feature' do
       before { subject.story_type = 'feature' }
 
-      context "when estimate is nil" do
+      context 'when estimate is nil' do
         before { subject.estimate = nil }
         it { is_expected.to be_estimable }
       end
 
-      context "when estimate is not nil" do
+      context 'when estimate is not nil' do
         before { subject.estimate = 0 }
         it { is_expected.not_to be_estimable }
       end
-
     end
 
-    ['chore', 'bug', 'release'].each do |story_type|
+    %w[chore bug release].each do |story_type|
       specify "a #{story_type} is not estimable" do
         subject.story_type = story_type
         expect(subject).not_to be_estimable
       end
     end
-
   end
 
-  describe "#set_position_to_last" do
-
-    context "when position is set" do
+  describe '#set_position_to_last' do
+    context 'when position is set' do
       before { subject.position = 42 }
 
-      it "does nothing" do
+      it 'does nothing' do
         expect(subject.set_position_to_last).to be true
         subject.position = 42
       end
     end
 
-    context "when there are no other stories" do
+    context 'when there are no other stories' do
       before { allow(subject).to receive_message_chain(:project, :stories, :order, :first).and_return(nil) }
 
-      it "sets position to 1" do
+      it 'sets position to 1' do
         subject.set_position_to_last
         expect(subject.position).to eq(1)
       end
     end
 
-    context "when there are other stories" do
-
+    context 'when there are other stories' do
       let(:last_story) { mock_model(Story, position: 41) }
 
       before do
         allow(subject).to receive_message_chain(:project, :stories, :order, :first).and_return(last_story)
       end
 
-      it "incrememnts the position by 1" do
+      it 'incrememnts the position by 1' do
         subject.set_position_to_last
         expect(subject.position).to eq(42)
       end
     end
   end
 
-  describe "#accepted_at" do
-
-    context "when not set" do
-
+  describe '#accepted_at' do
+    context 'when not set' do
       before { subject.accepted_at = nil }
 
-      # FIXME This is non-deterministic
+      # FIXME: This is non-deterministic
       it "gets set when state changes to 'accepted'" do
         Timecop.freeze(Time.zone.parse('2016-08-31 12:00:00')) do
           subject.started_at = 5.days.ago
@@ -192,19 +178,16 @@ describe Story, type: :model do
           expect(subject.cycle_time_in(:days)).to eq(5)
         end
       end
-
     end
 
-    context "when set" do
-
+    context 'when set' do
       before { subject.accepted_at = Time.zone.parse('1999/01/01') }
 
-      # FIXME This is non-deterministic
+      # FIXME: This is non-deterministic
       it "is unchanged when state changes to 'accepted'" do
         subject.update_attribute :state, 'accepted'
         expect(subject.accepted_at).to eq(Time.zone.parse('1999/01/01'))
       end
-
     end
   end
 
@@ -239,15 +222,13 @@ describe Story, type: :model do
     end
   end
 
-  describe "#started_at" do
-
-    context "when not set" do
-
+  describe '#started_at' do
+    context 'when not set' do
       before do
         subject.started_at = subject.owned_by = nil
       end
 
-      # FIXME This is non-deterministic
+      # FIXME: This is non-deterministic
       it "gets set when state changes to 'started'" do
         Timecop.freeze(Time.zone.parse('2016-08-31 12:00:00')) do
           subject.update_attribute :state, 'started'
@@ -255,36 +236,102 @@ describe Story, type: :model do
           expect(subject.owned_by).to eq(subject.acting_user)
         end
       end
-
     end
 
-    context "when set" do
-
+    context 'when set' do
       before { subject.started_at = Time.zone.parse('2016-09-01 13:00:00') }
 
-      # FIXME This is non-deterministic
+      # FIXME: This is non-deterministic
       it "is unchanged when state changes to 'started'" do
         subject.update_attribute :state, 'started'
         expect(subject.started_at).to eq(Time.zone.parse('2016-09-01 13:00:00'))
         expect(subject.owned_by).to eq(subject.acting_user)
       end
-
     end
   end
 
-  describe "#to_csv" do
+  describe '#to_csv' do
+    let(:story) { create(:story, :with_project) }
 
-    it "returns an array" do
-      expect(subject.to_csv).to be_kind_of(Array)
+    let(:number_of_extra_columns) { { tasks: 0, notes: 0, documents: 0 } }
+    let(:task) { double('task') }
+    let(:tasks) { [task] }
+
+    let(:note) { double('note') }
+    let(:notes) { [note] }
+
+    let(:document) { double('document') }
+    let(:documents) { [document] }
+
+    before do
+      allow(story).to receive(:tasks).and_return(tasks)
+      allow(story).to receive(:notes).and_return(notes)
+      allow(story).to receive(:documents).and_return(documents)
     end
 
-    it "has the same number of elements as the .csv_headers" do
-      expect(subject.to_csv.length).to eq(Story.csv_headers.length)
+    it 'returns an array' do
+      expect(story.to_csv(number_of_extra_columns)).to be_kind_of(Array)
+    end
+
+    it 'has the same number of elements as the .csv_headers' do
+      expect(story.to_csv(number_of_extra_columns).length).to eq(Story.csv_headers.length)
+    end
+
+    context 'when story have tasks' do
+      let(:task_name) { 'task_name' }
+      let(:task_status) { 'completed' }
+
+      before do
+        allow(task).to receive(:to_csv).and_return([task_name, task_status])
+        number_of_extra_columns[:tasks] = 1
+      end
+
+      it 'return task name' do
+        expect(story.to_csv(number_of_extra_columns)).to include(task_name)
+      end
+
+      it 'return task status' do
+        expect(story.to_csv(number_of_extra_columns)).to include(task_status)
+      end
+    end
+
+    context 'when story have notes' do
+      let(:note_body) { 'This is the note body text (Note Author - Dec 25, 2011)' }
+
+      before do
+        allow(note).to receive(:to_csv).and_return(note_body)
+        number_of_extra_columns[:notes] = 1
+      end
+
+      it 'return note body' do
+        expect(story.to_csv(number_of_extra_columns)).to include(note_body)
+      end
+    end
+
+    context 'when story have documents' do
+      let(:document_content) do
+        '{"attachinariable_type"=>"Story",
+          "scope"=>"documents",
+          "public_id"=>"programming-motherfucker-1-728_qhl2tl",
+          "version"=>"1540488712",
+          "width"=>728,
+          "height"=>546,
+          "format"=>"jpg",
+          "resource_type"=>"image"}'
+      end
+
+      before do
+        allow(document).to receive(:to_csv).and_return(document_content)
+        number_of_extra_columns[:documents] = 1
+      end
+
+      it 'return note body' do
+        expect(story.to_csv(number_of_extra_columns)).to include(document_content)
+      end
     end
   end
 
-  describe "#stakeholders_users" do
-
+  describe '#stakeholders_users' do
     let(:requested_by)  { mock_model(User) }
     let(:owned_by)      { mock_model(User) }
     let(:note_user)     { mock_model(User) }
@@ -308,60 +355,57 @@ describe Story, type: :model do
       expect(subject.stakeholders_users).to include(note_user)
     end
 
-    it "strips out nil values" do
+    it 'strips out nil values' do
       subject.requested_by = subject.owned_by = nil
       expect(subject.stakeholders_users).not_to include(nil)
     end
   end
 
-  context "when unscheduled" do
+  context 'when unscheduled' do
     before { subject.state = 'unscheduled' }
     its(:events)  { should == [:start] }
     its(:column)  { should == '#chilly_bin' }
   end
 
-  context "when unstarted" do
+  context 'when unstarted' do
     before { subject.state = 'unstarted' }
     its(:events)  { should == [:start] }
     its(:column)  { should == '#backlog' }
   end
 
-  context "when started" do
+  context 'when started' do
     before { subject.state = 'started' }
     its(:events)  { should == [:finish] }
     its(:column)  { should == '#in_progress' }
   end
 
-  context "when finished" do
+  context 'when finished' do
     before { subject.state = 'finished' }
     its(:events)  { should == [:deliver] }
     its(:column)  { should == '#in_progress' }
   end
 
-  context "when delivered" do
+  context 'when delivered' do
     before { subject.state = 'delivered' }
     its(:events)  { should include(:accept) }
     its(:events)  { should include(:reject) }
     its(:column)  { should == '#in_progress' }
   end
 
-  context "when rejected" do
+  context 'when rejected' do
     before { subject.state = 'rejected' }
     its(:events)  { should == [:restart] }
     its(:column)  { should == '#in_progress' }
   end
 
-  context "when accepted" do
+  context 'when accepted' do
     before { subject.state = 'accepted' }
     its(:events)  { should == [] }
     its(:column)  { should == '#done' }
   end
 
-
   describe '.csv_headers' do
-
     specify { expect(Story.csv_headers).to be_kind_of(Array) }
-
   end
 
   describe '#cache_user_names' do
@@ -380,7 +424,7 @@ describe Story, type: :model do
     end
 
     context 'when removing a owner to a story' do
-      let(:owner)      { build(:user) }
+      let(:owner) { build(:user) }
       let(:story) { create(:story, :with_project, owned_by: owner) }
 
       before do

@@ -10,13 +10,13 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170913191524) do
+ActiveRecord::Schema.define(version: 20181030162426) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
   enable_extension "hstore"
 
-  create_table "activities", force: :cascade do |t|
+  create_table "activities", id: :bigserial, force: :cascade do |t|
     t.integer  "project_id",             null: false
     t.integer  "user_id",                null: false
     t.integer  "subject_id"
@@ -31,7 +31,22 @@ ActiveRecord::Schema.define(version: 20170913191524) do
     t.index ["user_id"], name: "index_activities_on_user_id", using: :btree
   end
 
-  create_table "enrollments", force: :cascade do |t|
+  create_table "attachinary_files", force: :cascade do |t|
+    t.string   "attachinariable_type"
+    t.integer  "attachinariable_id"
+    t.string   "scope"
+    t.string   "public_id"
+    t.string   "version"
+    t.integer  "width"
+    t.integer  "height"
+    t.string   "format"
+    t.string   "resource_type"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.index ["attachinariable_type", "attachinariable_id", "scope"], name: "by_scoped_parent", using: :btree
+  end
+
+  create_table "enrollments", id: :bigserial, force: :cascade do |t|
     t.integer  "team_id",                    null: false
     t.integer  "user_id",                    null: false
     t.boolean  "is_admin",   default: false, null: false
@@ -40,7 +55,7 @@ ActiveRecord::Schema.define(version: 20170913191524) do
     t.index ["team_id", "user_id"], name: "index_enrollments_on_team_id_and_user_id", unique: true, using: :btree
   end
 
-  create_table "integrations", force: :cascade do |t|
+  create_table "integrations", id: :bigserial, force: :cascade do |t|
     t.integer  "project_id"
     t.string   "kind",       null: false
     t.hstore   "data",       null: false
@@ -49,7 +64,7 @@ ActiveRecord::Schema.define(version: 20170913191524) do
     t.index ["data"], name: "index_integrations_on_data", using: :gin
   end
 
-  create_table "memberships", force: :cascade do |t|
+  create_table "memberships", id: :bigserial, force: :cascade do |t|
     t.integer  "project_id"
     t.integer  "user_id"
     t.datetime "created_at"
@@ -59,7 +74,7 @@ ActiveRecord::Schema.define(version: 20170913191524) do
     t.index ["user_id"], name: "index_memberships_on_user_id", using: :btree
   end
 
-  create_table "notes", force: :cascade do |t|
+  create_table "notes", id: :bigserial, force: :cascade do |t|
     t.text     "note"
     t.integer  "user_id"
     t.integer  "story_id"
@@ -68,7 +83,7 @@ ActiveRecord::Schema.define(version: 20170913191524) do
     t.string   "user_name"
   end
 
-  create_table "ownerships", force: :cascade do |t|
+  create_table "ownerships", id: :bigserial, force: :cascade do |t|
     t.integer  "team_id",                    null: false
     t.integer  "project_id",                 null: false
     t.boolean  "is_owner",   default: false, null: false
@@ -77,7 +92,7 @@ ActiveRecord::Schema.define(version: 20170913191524) do
     t.index ["team_id", "project_id"], name: "index_ownerships_on_team_id_and_project_id", unique: true, using: :btree
   end
 
-  create_table "projects", force: :cascade do |t|
+  create_table "projects", id: :bigserial, force: :cascade do |t|
     t.string   "name"
     t.string   "point_scale",         default: "fibonacci"
     t.date     "start_date"
@@ -93,7 +108,7 @@ ActiveRecord::Schema.define(version: 20170913191524) do
     t.index ["slug"], name: "index_projects_on_slug", unique: true, using: :btree
   end
 
-  create_table "stories", force: :cascade do |t|
+  create_table "stories", id: :bigserial, force: :cascade do |t|
     t.string   "title"
     t.text     "description"
     t.integer  "estimate"
@@ -115,7 +130,16 @@ ActiveRecord::Schema.define(version: 20170913191524) do
     t.datetime "delivered_at"
   end
 
-  create_table "teams", force: :cascade do |t|
+  create_table "tasks", id: :bigserial, force: :cascade do |t|
+    t.integer  "story_id"
+    t.string   "name",       limit: 255
+    t.boolean  "done",                   default: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.index ["story_id"], name: "index_tasks_on_story_id", using: :btree
+  end
+
+  create_table "teams", id: :bigserial, force: :cascade do |t|
     t.string   "name",                                          null: false
     t.string   "slug"
     t.string   "logo"
@@ -129,7 +153,7 @@ ActiveRecord::Schema.define(version: 20170913191524) do
     t.index ["slug"], name: "index_teams_on_slug", unique: true, using: :btree
   end
 
-  create_table "users", force: :cascade do |t|
+  create_table "users", id: :bigserial, force: :cascade do |t|
     t.string   "email",                              default: "",          null: false
     t.string   "encrypted_password",     limit: 128, default: "",          null: false
     t.string   "reset_password_token"

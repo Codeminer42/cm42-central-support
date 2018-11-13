@@ -11,6 +11,8 @@ gem 'central-support', path: File.expand_path("../../../..", __FILE__)
 gem 'devise'
 gem 'pg'
 gem 'friendly_id'
+gem 'attachinary'
+gem 'cloudinary'
 
 group :test do
   gem 'test-unit'
@@ -23,10 +25,13 @@ group :test do
   gem 'codeclimate-test-reporter', "~> 1.0.0"
   gem 'simplecov'
   gem 'timecop'
+  gem 'vcr'
+  gem 'webmock'
 end
 
 group :development, :test do
   gem 'awesome_print'
   gem 'pry-byebug'
   gem 'listen'
+  gem 'dotenv-rails'
 end

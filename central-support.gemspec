@@ -27,4 +27,6 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency "activerecord", ">= 3.2"
   spec.add_runtime_dependency 'enumerize', "~> 2.0"
   spec.add_runtime_dependency 'transitions', "~> 0.1.9"
+  spec.add_development_dependency 'vcr', "~> 1.3.1"
+  spec.add_development_dependency 'attachinary', "~> 1.3.1"
 end
