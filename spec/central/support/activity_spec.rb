@@ -16,31 +16,38 @@ describe Activity, type: :model do
     let(:story) { create(:story, :with_project) }
     let(:activity) { build(:activity, action: 'update', subject: story ) }
 
-    context 'nothing changed' do
-      it 'is invalid' do
-        activity.valid?
-        expect(activity.errors[:subject].count).to be(1)
-      end
-    end
-
     it "should save without parsing changes" do
       activity.action = 'create'
       expect(activity.save).to be_truthy
     end
 
     it "should fetch the changes from the model" do
+      first_update = story.updated_at
       story.title = 'new story title'
-      story.estimate = 4
+      story.estimate = 2
       story.position = 1.5
       story.state = 'finished'
-
+      
+      story.save
       activity.save
 
       expect(activity.subject_changes).to eq({
         "title"=>["Test story", "new story title"],
-        "estimate"=>[nil, 4],
+        "estimate"=>[nil, 2],
         "position"=>[1.0, 1.5],
-        "state"=>["unstarted", "finished"]})
+        "state"=>["unstarted", "finished"],
+        "updated_at" => [first_update, story.updated_at]
+      })
+    end
+  end
+
+  context 'update with no changes' do
+    let!(:story) { build(:story, :with_project) }
+    let(:activity) { build(:activity, action: 'update', subject: story ) }
+
+    it 'is invalid' do
+      activity.valid?
+      expect(activity.errors[:subject].count).to be(1)
     end
   end
 

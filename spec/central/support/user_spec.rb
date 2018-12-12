@@ -19,8 +19,31 @@ describe User, type: :model do
     it { is_expected.to validate_inclusion_of(:role).in_array(User::ROLES) }
   end
 
+  describe "associations" do
+
+    it { is_expected.to have_many(:enrollments) }
+    it { is_expected.to have_many(:teams) }
+    it { is_expected.to have_many(:memberships) }
+    it { is_expected.to have_many(:projects) }
+
+    describe "validate distinctiveness of projects through memberships" do
+      let(:user) { create :user }
+      let(:project) { create :project }
+      
+      before do
+        create :membership, user: user, project: project
+      end
+
+      it "doesn't allow the same project in two different memberships" do
+        expect{
+          create :membership, user: user, project: project
+        }.to raise_error(ActiveRecord::RecordNotUnique)
+      end
+    end
+  end
+
   describe "#remove_story_association" do
-    let(:user) { create :user}
+    let(:user) { create :user }
     let(:project) { build :project }
     let(:story) { build :story, project: project }
 
@@ -39,6 +62,4 @@ describe User, type: :model do
       expect(story.requested_by).to be_nil
     end
   end
-
 end
-

@@ -9,7 +9,7 @@ module Central
           has_many :teams, through: :enrollments
 
           has_many :memberships, dependent: :destroy
-          has_many :projects, -> { uniq }, through: :memberships do
+          has_many :projects, -> { distinct }, through: :memberships do
             def not_archived
               where(archived_at: nil)
             end
