@@ -42,13 +42,14 @@ describe Activity, type: :model do
   end
 
   context 'update with no changes' do
-    let!(:story) { build(:story, :with_project) }
-    let(:activity) { build(:activity, action: 'update', subject: story ) }
+    let(:story) { build(:story, :with_project) }
+    subject { build(:activity, action: 'update', subject: story) }
 
-    it 'is invalid' do
-      activity.valid?
-      expect(activity.errors[:subject].count).to be(1)
-    end
+    before { subject.validate }
+
+    it { is_expected.to be_invalid }
+    it { expect(subject.errors[:subject].count).to be(1) }
+    it { expect(subject.errors[:subject].to_sentence).to eq("Record didn't change")}
   end
 
   context '#grouped_activities' do

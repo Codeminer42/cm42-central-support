@@ -20,7 +20,6 @@ describe User, type: :model do
   end
 
   describe "associations" do
-
     it { is_expected.to have_many(:enrollments) }
     it { is_expected.to have_many(:teams) }
     it { is_expected.to have_many(:memberships) }
@@ -35,9 +34,9 @@ describe User, type: :model do
       end
 
       it "doesn't allow the same project in two different memberships" do
-        expect{
+        expect do
           create :membership, user: user, project: project
-        }.to raise_error(ActiveRecord::RecordNotUnique)
+        end.to raise_error(ActiveRecord::RecordNotUnique)
       end
     end
   end
