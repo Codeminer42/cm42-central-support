@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 RSpec.configure do |config|
-  config.include FactoryGirl::Syntax::Methods
+  config.include FactoryBot::Syntax::Methods
 
   config.before(:suite) do
-    # FactoryGirl.lint
+    # FactoryBot.lint
   end
 end

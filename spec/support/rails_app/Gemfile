@@ -21,7 +21,7 @@ group :test do
   gem 'rspec-activemodel-mocks'
   gem 'shoulda-matchers'
   gem 'database_cleaner'
-  gem 'factory_girl_rails'
+  gem 'factory_bot_rails'
   gem 'codeclimate-test-reporter', "~> 1.0.0"
   gem 'simplecov'
   gem 'timecop'
