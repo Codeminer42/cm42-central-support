@@ -4,7 +4,7 @@ module Central
       extend ActiveSupport::Concern
 
       included do
-        VALID_INTEGRATIONS = ['discord','mattermost','slack']
+        VALID_INTEGRATIONS = %w[discord mattermost slack gitlab].freeze
 
         belongs_to :project
         validates :project, presence: true
