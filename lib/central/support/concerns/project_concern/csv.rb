@@ -4,7 +4,7 @@ module Central
       module CSV
         module InstanceMethods
           def csv_filename
-            "#{name}-#{Time.now.strftime('%Y%m%d_%I%M')}.csv"
+            "#{name}-#{Time.current.strftime('%Y%m%d_%I%M')}.csv"
           end
         end
 
