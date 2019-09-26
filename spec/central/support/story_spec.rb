@@ -60,18 +60,20 @@ describe Story, type: :model do
         expect(subject.errors[:estimate].size).to eq(1)
       end
 
-      it 'must be invalid for bug stories' do
-        subject.story_type = 'bug'
-        subject.estimate = 2
+      context 'when try to estimate' do
+        %w[chore bug release].each do |type|
+          context "a #{type} story" do
+            before { subject.attributes = { story_type: type, estimate: 1 } }
 
-        expect(subject).to_not be_valid
-      end
+            it { is_expected.to be_invalid }
+          end
+        end
 
-      it 'must be invalid for chore stories' do
-        subject.story_type = 'chore'
-        subject.estimate = 1
+        context 'a feature story' do
+          before { subject.attributes = { story_type: 'feature', estimate: 1 } }
 
-        expect(subject).to_not be_valid
+          it { is_expected.to be_valid }
+        end
       end
     end
   end
@@ -98,37 +100,32 @@ describe Story, type: :model do
   end
 
   describe '#estimated?' do
-    context 'when estimate is nil' do
+    context 'when the story estimation is nil' do
       before { subject.estimate = nil }
+
       it { is_expected.not_to be_estimated }
     end
 
-    context 'when estimate is not nil' do
-      before { subject.estimate = 0 }
+    context 'when the story estimation is 1' do
+      before { subject.estimate = 1 }
+
       it { is_expected.to be_estimated }
     end
   end
 
-  describe '#estimable?' do
-    context 'when story is a feature' do
-      before { subject.story_type = 'feature' }
+  describe '#estimable_type?' do
+    %w[chore bug release].each do |type|
+      context "when is a #{type} story" do
+        before { subject.story_type = type }
 
-      context 'when estimate is nil' do
-        before { subject.estimate = nil }
-        it { is_expected.to be_estimable }
-      end
-
-      context 'when estimate is not nil' do
-        before { subject.estimate = 0 }
-        it { is_expected.not_to be_estimable }
+        it { is_expected.not_to be_estimable_type }
       end
     end
 
-    %w[chore bug release].each do |story_type|
-      specify "a #{story_type} is not estimable" do
-        subject.story_type = story_type
-        expect(subject).not_to be_estimable
-      end
+    context 'when is a feature story' do
+      before { subject.story_type = 'feature' }
+
+      it { is_expected.to be_estimable_type }
     end
   end
 
