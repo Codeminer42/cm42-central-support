@@ -12,32 +12,30 @@ module Central
           validates :owned_by_id, belongs_to_project: true
 
           ESTIMABLE_TYPES = %w[feature].freeze
-          STORY_TYPES = %i[feature chore bug release].freeze
+          STORY_TYPES     = %i[feature chore bug release].freeze
 
           extend Enumerize
           enumerize :story_type, in: STORY_TYPES, predicates: true, scope: true
           validates :story_type, presence: true
           validates :estimate, estimate: true, allow_nil: true
 
-          validate :bug_chore_estimation
+          validate :validate_non_estimable_story
         end
 
         # Returns true or false based on whether the story has been estimated.
         def estimated?
-          !estimate.nil?
+          estimate.present?
         end
-        alias :estimated :estimated?
 
         # Returns true if this story can have an estimate made against it
-        def estimable?
-          feature? && !estimated?
+        def estimable_type?
+          ESTIMABLE_TYPES.include? story_type
         end
-        alias :estimable :estimable?
 
-        def bug_chore_estimation
-          if !ESTIMABLE_TYPES.include?(story_type) && estimated?
-            errors.add(:estimate, :cant_estimate)
-          end
+        private
+
+        def validate_non_estimable_story
+          errors.add(:estimate, :cant_estimate) if !estimable_type? && estimated?
         end
       end
     end
