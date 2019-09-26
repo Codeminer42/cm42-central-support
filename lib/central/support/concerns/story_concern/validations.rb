@@ -11,7 +11,7 @@ module Central
           validates :requested_by_id, belongs_to_project: true
           validates :owned_by_id, belongs_to_project: true
 
-          ESTIMABLE_TYPES = %w[feature release]
+          ESTIMABLE_TYPES = %w[feature].freeze
           STORY_TYPES = %i[feature chore bug release].freeze
 
           extend Enumerize
